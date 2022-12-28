@@ -2,73 +2,60 @@ library flutter_secure_storage_web;
 
 import 'dart:convert';
 import 'dart:html' as html;
-import 'dart:js_util' as js_util;
 import 'dart:typed_data';
+import 'dart:js_util' as js_util;
 
 import 'package:flutter_secure_storage_platform_interface/flutter_secure_storage_platform_interface.dart';
-import 'package:flutter_secure_storage_web/src/subtle.dart' as crypto;
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 
-/// Web implementation of FlutterSecureStorage
-class FlutterSecureStorageWeb extends FlutterSecureStoragePlatform {
-  static const _publicKey = 'publicKey';
+import './src/subtle.dart' as crypto;
 
-  /// Registrar for FlutterSecureStorageWeb
+class FlutterSecureStorageWeb extends FlutterSecureStoragePlatform {
+  static const _PUBLIC_KEY = 'publicKey';
+
   static void registerWith(Registrar registrar) {
     FlutterSecureStoragePlatform.instance = FlutterSecureStorageWeb();
   }
 
-  /// Returns true if the storage contains the given [key].
   @override
   Future<bool> containsKey({
     required String key,
     required Map<String, String> options,
   }) =>
-      Future.value(
-        html.window.localStorage.containsKey("${options[_publicKey]!}.$key"),
-      );
+      Future.value(html.window.localStorage
+          .containsKey(options[_PUBLIC_KEY]! + "." + key));
 
-  /// Deletes associated value for the given [key].
-  ///
-  /// If the given [key] does not exist, nothing will happen.
   @override
   Future<void> delete({
     required String key,
     required Map<String, String> options,
-  }) async {
-    html.window.localStorage.remove("${options[_publicKey]!}.$key");
-  }
+  }) =>
+      Future.value(
+          html.window.localStorage.remove(options[_PUBLIC_KEY]! + "." + key));
 
-  /// Deletes all keys with associated values.
   @override
   Future<void> deleteAll({
     required Map<String, String> options,
   }) =>
       Future.sync(
-        () => html.window.localStorage.removeWhere((key, value) => true),
-      );
+          () => html.window.localStorage.removeWhere((key, value) => true));
 
-  /// Encrypts and saves the [key] with the given [value].
-  ///
-  /// If the key was already in the storage, its associated value is changed.
-  /// If the value is null, deletes associated value for the given [key].
   @override
   Future<String?> read({
     required String key,
     required Map<String, String> options,
   }) async {
-    final value = html.window.localStorage["${options[_publicKey]!}.$key"];
+    final value = html.window.localStorage[options[_PUBLIC_KEY]! + "." + key];
 
-    return _decryptValue(value, options);
+    return await _decryptValue(value, options);
   }
 
-  /// Decrypts and returns all keys with associated values.
   @override
   Future<Map<String, String>> readAll({
     required Map<String, String> options,
   }) async {
     final map = <String, String>{};
-    final prefix = "${options[_publicKey]!}.";
+    final prefix = options[_PUBLIC_KEY]! + ".";
     for (int j = 0; j < html.window.localStorage.length; j++) {
       final entry = html.window.localStorage.entries.elementAt(j);
       if (!entry.key.startsWith(prefix)) {
@@ -91,11 +78,9 @@ class FlutterSecureStorageWeb extends FlutterSecureStoragePlatform {
       crypto.Algorithm(name: 'AES-GCM', length: 256, iv: iv);
 
   Future<html.CryptoKey> _getEncryptionKey(
-    crypto.Algorithm algorithm,
-    Map<String, String> options,
-  ) async {
+      crypto.Algorithm algorithm, Map<String, String> options) async {
     late html.CryptoKey encryptionKey;
-    final key = options[_publicKey]!;
+    final key = options[_PUBLIC_KEY]!;
 
     if (html.window.localStorage.containsKey(key)) {
       final jwk = base64Decode(html.window.localStorage[key]!);
@@ -118,10 +103,6 @@ class FlutterSecureStorageWeb extends FlutterSecureStoragePlatform {
     return encryptionKey;
   }
 
-  /// Encrypts and saves the [key] with the given [value].
-  ///
-  /// If the key was already in the storage, its associated value is changed.
-  /// If the value is null, deletes associated value for the given [key].
   @override
   Future<void> write({
     required String key,
@@ -146,9 +127,9 @@ class FlutterSecureStorageWeb extends FlutterSecureStoragePlatform {
     );
 
     final encoded =
-        "${base64Encode(iv)}.${base64Encode(encryptedContent.asUint8List())}";
+        base64Encode(iv) + "." + base64Encode(encryptedContent.asUint8List());
 
-    html.window.localStorage["${options[_publicKey]!}.$key"] = encoded;
+    html.window.localStorage[options[_PUBLIC_KEY]! + "." + key] = encoded;
   }
 
   Future<String?> _decryptValue(

@@ -1,18 +1,5 @@
 # flutter_secure_storage
 
-## Note: usage of encryptedSharedPreference
-When using the `encryptedSharedPreferences` parameter on Android, make sure to pass the option to the
-constructor instead of the function like so: 
-```dart
-  AndroidOptions _getAndroidOptions() => const AndroidOptions(
-        encryptedSharedPreferences: true,
-      );
-final storage = FlutterSecureStorage(aOptions: _getAndroidOptions());
-```
-This will prevent errors due to mixed usage of `encryptedSharedPreferences`.
-For more info, [see this issue](https://github.com/mogol/flutter_secure_storage/issues/487#issuecomment-1346244368).
-
-## Info
 A Flutter plugin to store data in secure storage:
 
 - [Keychain](https://developer.apple.com/library/content/documentation/Security/Conceptual/keychainServConcepts/01introduction/introduction.html#//apple_ref/doc/uid/TP30000897-CH203-TP1) is used for iOS
@@ -119,12 +106,7 @@ parts:
 
 ## Configure MacOS Version
 
-You also need to add Keychain Sharing as capability to your macOS runner. To achieve this, please add the following in *both* your `macos/Runner/DebugProfile.entitlements` *and* `macos/Runner/Release.entitlements` (you need to change both files).
-
-```
-<key>keychain-access-groups</key>
-<array/>
-```
+You also need to add Keychain Sharing as capability to your macOS runner.
 
 ## Integration Tests
 

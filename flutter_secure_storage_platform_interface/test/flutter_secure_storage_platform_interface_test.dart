@@ -16,13 +16,10 @@ void main() {
     });
 
     test('Cannot be implemented with `implements`', () {
-      expect(
-        () {
-          FlutterSecureStoragePlatform.instance =
-              ImplementsFlutterSecureStoragePlatform();
-        },
-        throwsA(isInstanceOf<AssertionError>()),
-      );
+      expect(() {
+        FlutterSecureStoragePlatform.instance =
+            ImplementsFlutterSecureStoragePlatform();
+      }, throwsA(isInstanceOf<AssertionError>()));
     });
 
     test('Can be mocked with `implements`', () {

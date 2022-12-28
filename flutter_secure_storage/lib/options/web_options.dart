@@ -1,6 +1,5 @@
 part of flutter_secure_storage;
 
-/// Specific options for web platform.
 class WebOptions extends Options {
   const WebOptions({
     this.dbName = 'FlutterEncryptedStorage',

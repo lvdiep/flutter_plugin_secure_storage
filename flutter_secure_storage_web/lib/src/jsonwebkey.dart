@@ -21,7 +21,6 @@
 class JsonWebKey {
   String? kty;
   String? use;
-  // ignore: non_constant_identifier_names
   List<String>? key_ops;
   String? alg;
   bool? ext;
@@ -42,7 +41,6 @@ class JsonWebKey {
   JsonWebKey({
     this.kty,
     this.use,
-    // ignore: non_constant_identifier_names
     this.key_ops,
     this.alg,
     this.ext,
@@ -61,7 +59,6 @@ class JsonWebKey {
     this.k,
   });
 
-  //ignore: prefer_constructors_over_static_methods
   static JsonWebKey fromJson(Map<String, dynamic> json) {
     const stringKeys = [
       'kty',
@@ -85,16 +82,14 @@ class JsonWebKey {
         throw FormatException('JWK entry "$k" must be a string', json);
       }
     }
-    List<String>? keyOps;
+    List<String>? key_ops;
     if (json.containsKey('key_ops')) {
       if (json['key_ops'] is! List ||
           (json['key_ops'] as List).any((e) => e is! String)) {
         throw FormatException(
-          'JWK entry "key_ops" must be a list of strings',
-          json,
-        );
+            'JWK entry "key_ops" must be a list of strings', json);
       }
-      keyOps = (json['key_ops'] as List).map((e) => e as String).toList();
+      key_ops = (json['key_ops'] as List).map((e) => e as String).toList();
     }
 
     if (json.containsKey('ext') && json['ext'] is! bool) {
@@ -112,7 +107,7 @@ class JsonWebKey {
     return JsonWebKey(
       kty: json['kty'] as String?,
       use: json['use'] as String?,
-      key_ops: keyOps,
+      key_ops: key_ops,
       alg: json['alg'] as String?,
       ext: json['ext'] as bool?,
       crv: json['crv'] as String?,
@@ -197,9 +192,9 @@ class JsonWebKey {
     }
 
     // Set non-string properties
-    final keyOps = key_ops;
-    if (keyOps != null) {
-      json['key_ops'] = keyOps;
+    final key_ops_ = key_ops;
+    if (key_ops_ != null) {
+      json['key_ops'] = key_ops_;
     }
     final ext_ = ext;
     if (ext_ != null) {
@@ -231,7 +226,6 @@ class RsaOtherPrimesInfo {
   String d;
   String t;
 
-  //ignore: prefer_constructors_over_static_methods
   static RsaOtherPrimesInfo fromJson(Map json) {
     for (final k in ['r', 'd', 't']) {
       if (json[k] is! String) {
